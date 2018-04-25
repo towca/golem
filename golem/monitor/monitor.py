@@ -1,7 +1,10 @@
 import logging
+import logstash
 import queue
 import threading
 import time
+import json
+
 from typing import Optional, Dict
 from urllib.parse import urljoin
 
@@ -21,6 +24,10 @@ from .transport.sender import DefaultJSONSender as Sender
 
 log = logging.getLogger('golem.monitor')
 
+test_logger = logging.getLogger('python-logstash-logger')
+test_logger.setLevel(logging.INFO)
+test_logger.addHandler(logstash.LogstashHandler('34.246.189.145', 5959, version=1))
+
 
 class SenderThread(threading.Thread):
     def __init__(self, node_info, monitor_host, monitor_request_timeout,
@@ -33,6 +40,7 @@ class SenderThread(threading.Thread):
         self.monitor_sender_thread_timeout = monitor_sender_thread_timeout
 
     def send(self, o):
+        test_logger.info(json.dumps(o.__dict__))
         self.queue.put(o)
 
     def run(self):
