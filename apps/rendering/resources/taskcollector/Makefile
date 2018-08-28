@@ -4,7 +4,7 @@ ifeq ($(UNAME), Darwin)
 	CXX=g++
 	LDFLAGS=-lfreeimage
 else
-	CXX=g++-5
+	CXX=g++
 	LDFLAGS=-lfreeimage
 endif
 
