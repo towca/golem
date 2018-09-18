@@ -21,14 +21,16 @@ from apps.core.task.coretask import (CoreTask,
 from golem.core.common import HandleKeyError, timeout_to_deadline, to_unicode, \
     string_to_timeout
 from apps.pdfgen.pdfgenenvironment import PDFgenTaskEnvironment
-from apps.pdfgen.task.pdfgentaskstate import PDFgenTaskDefaults, PDFgenTaskOptions
+from apps.pdfgen.task.pdfgentaskstate import PDFgenTaskDefaults
+from apps.pdfgen.task.pdfgentaskstate import PDFgenTaskOptions
 from apps.pdfgen.task.pdfgentaskstate import PDFgenTaskDefinition
 from apps.pdfgen.task.verifier import PDFgenTaskVerifier
-from golem.task.taskbase import Task 
+from golem.task.taskbase import Task
 from golem.task.taskclient import TaskClient
 from golem.task.taskstate import SubtaskStatus
 
 logger = logging.getLogger("apps.pdfgen")
+
 
 def unique_string_generator(size=4, length=4):
     ret = set()
@@ -41,6 +43,7 @@ def unique_string_generator(size=4, length=4):
         else:
             ret.add(uniq_string)
     return ret
+
 
 class PDFgenTaskTypeInfo(CoreTaskTypeInfo):
     def __init__(self):
@@ -76,19 +79,21 @@ class PDFgenTask(CoreTask):
         # result in ambiguity on what to load
         assert len(self.resource_data_list) == 1
 
-        res_file = os.path.join(self.task_definition.tmp_dir, 
+        res_file = os.path.join(self.task_definition.tmp_dir,
                                 "data",
                                 self.resource_data_list[0])
         with open(res_file, 'r') as f:
             content = f.read().split()
-            
+
         def split(a, n):
             k, m = divmod(len(a), n)
-            return [a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n)]
+            return [a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)]
+                    for i in range(n)]
 
         self.chunks = split(content, self.total_tasks)
 
-        assert len(self.chunks) == self.total_tasks, 'input is too small for such number of subtasks'
+        assert len(self.chunks) == \
+            self.total_tasks, 'input is too small for such number of subtasks'
 
         self.task_chunk_id_map = {}
         self.uniq_strings = unique_string_generator(self.total_tasks)
@@ -98,7 +103,8 @@ class PDFgenTask(CoreTask):
 
     def resend_failed_tasks(self):
         for sub in self.subtasks_given.values():
-            if sub['status'] in [SubtaskStatus.failure, SubtaskStatus.restarted]:
+            if sub['status'] in [SubtaskStatus.failure,
+                                 SubtaskStatus.restarted]:
                 sub['status'] = SubtaskStatus.resent
                 self.num_failed_subtasks -= 1
 
@@ -109,7 +115,7 @@ class PDFgenTask(CoreTask):
 
         extra_data = {
             "output_name": 'output{}.pdf'.format(self.uniq_strings.pop()),
-            "content": '\n'.join(self.chunks[self.last_task])
+            "content": '\n'.join(self.chunks[self.last_task]) + '\n'
         }
 
         self.last_task += 1
@@ -128,7 +134,7 @@ class PDFgenTask(CoreTask):
         ctd = self._extra_data(perf_index)
         sid = ctd['subtask_id']
 
-        #FIXME Is this necessary?
+        # FIXME Is this necessary?
         self.subtasks_given[sid] = copy(ctd['extra_data'])
         self.subtasks_given[sid]["status"] = SubtaskStatus.starting
         self.subtasks_given[sid]["perf"] = perf_index
@@ -138,21 +144,22 @@ class PDFgenTask(CoreTask):
             self.task_definition.shared_data_files
         self.subtasks_given[sid]["subtask_id"] = sid
         self.resend_failed_tasks()
-        
+
         return self.ExtraData(ctd=ctd)
 
     def write_merged_pdf(self, results):
         merger = PdfFileMerger()
 
         # Merge in appropriate order
-        import pdb; pdb.set_trace()
-        sorted_subtasks_ids = sorted(results.keys(), key=lambda x: self.task_chunk_id_map[x])
+        sorted_subtasks_ids = sorted(results.keys(),
+                                     key=lambda x: self.task_chunk_id_map[x])
         for subtask_id in sorted_subtasks_ids:
             f = open(results[subtask_id][0], 'rb')
             merger.append(PdfFileReader(f))
 
         merger.write(self.task_definition.output_file)
-        logger.info("PDFgen task finished, results stored in: {}".format(self.task_definition.output_file))
+        logger.info("PDFgen task finished, results stored in: {}"
+                    .format(self.task_definition.output_file))
 
     def accept_results(self, subtask_id, result_files):
         super().accept_results(subtask_id, result_files)
@@ -174,6 +181,7 @@ class PDFgenTask(CoreTask):
         else:
             return "."
 
+
 class PDFgenTaskBuilder(CoreTaskBuilder):
     TASK_CLASS = PDFgenTask
 
@@ -182,7 +190,8 @@ class PDFgenTaskBuilder(CoreTaskBuilder):
         return super().build_dictionary(definition)
 
     @classmethod
-    def build_minimal_definition(cls, task_type: PDFgenTaskTypeInfo, dictionary):
+    def build_minimal_definition(cls, task_type: PDFgenTaskTypeInfo,
+                                 dictionary):
         definition = task_type.definition()
         definition.options = task_type.options()
         definition.task_type = task_type.name
@@ -227,7 +236,6 @@ class PDFgenTaskBuilder(CoreTaskBuilder):
         definition.output_file = cls.get_output_path(dictionary, definition)
         definition.estimated_memory = dictionary.get('estimated_memory', 0)
         return definition
-
 
 
 # comment that line to enable type checking

@@ -17,9 +17,9 @@ class PDFgenTaskDefaults(TaskDefaults):
     def __init__(self):
         super(PDFgenTaskDefaults, self).__init__()
         self.options = PDFgenTaskOptions()
-        self.out_file_basename = "out"
         self.shared_data_files = ['input.txt']
         self.default_subtasks = 1
+        self.output_file = "output.pdf"
         self.code_dir = os.path.join(get_golem_path(),
                                      "apps", "pdfgen", "resources", "code_dir")
 
@@ -37,8 +37,7 @@ class PDFgenTaskDefinition(TaskDefinition):
                                      "apps", "pdfgen", "resources", "code_dir")
         self.code_files = []
 
-        self.result_size = 256  # length of result hex number
-        self.out_file_basename = "out"
+        self.output_file = ''
 
         if defaults:
             self.set_defaults(defaults)
@@ -76,6 +75,7 @@ class PDFgenTaskDefinition(TaskDefinition):
         self.code_dir = defaults.code_dir
         self.total_subtasks = defaults.default_subtasks
         self.options = deepcopy(defaults.options)
+        self.output_file = defaults.output_file
 
 
 class PDFgenTaskOptions(Options):
