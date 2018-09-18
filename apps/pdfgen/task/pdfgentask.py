@@ -40,7 +40,7 @@ def unique_string_generator(size=4, length=4):
             continue
         else:
             ret.add(uniq_string)
-    return list(ret)
+    return ret
 
 class PDFgenTaskTypeInfo(CoreTaskTypeInfo):
     def __init__(self):
@@ -108,7 +108,7 @@ class PDFgenTask(CoreTask):
         self.task_chunk_id_map[subtask_id] = self.last_task
 
         extra_data = {
-            "output_name": 'output{}.pdf'.format(self.uniq_strings[self.last_task]),
+            "output_name": 'output{}.pdf'.format(self.uniq_strings.pop()),
             "content": '\n'.join(self.chunks[self.last_task])
         }
 
