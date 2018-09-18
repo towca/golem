@@ -30,8 +30,8 @@ class TestAppsManager(TestCase):
     def test_get_benchmarks(self):
         app_manager = self._get_loaded_app_manger()
         benchmarks = app_manager.get_benchmarks()
-        # We have 2 compuational envs registered
-        assert len(benchmarks) == 3
+        # We have 4 compuational envs registered
+        assert len(benchmarks) == 4
         # Let's check that benchmarks values are defined properly
         for benchmark in benchmarks.values():
             benchmark, builder_class = benchmark
