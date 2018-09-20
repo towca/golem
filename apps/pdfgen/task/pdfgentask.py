@@ -34,7 +34,7 @@ logger = logging.getLogger("apps.pdfgen")
 
 def unique_string_generator(size=4, length=4):
     ret = set()
-    charset = string.ascii_letters + string.punctuation + string.digits
+    charset = string.ascii_letters + string.digits
 
     while len(ret) != size:
         uniq_string = "".join(random.choice(charset) for x in range(length))
@@ -72,16 +72,11 @@ class PDFgenTask(CoreTask):
             root_path=root_path,
             total_tasks=total_tasks
         )
-        self.resource_data_list = os.listdir(
-            os.path.join(self.task_definition.tmp_dir, "data"))
-
         # Only single file as a resource input is allowed, more than one will
         # result in ambiguity on what to load
-        assert len(self.resource_data_list) == 1
+        assert len(self.task_definition.shared_data_files) == 1
+        res_file = self.task_definition.shared_data_files[0]
 
-        res_file = os.path.join(self.task_definition.tmp_dir,
-                                "data",
-                                self.resource_data_list[0])
         with open(res_file, 'r') as f:
             content = f.read().split()
 
