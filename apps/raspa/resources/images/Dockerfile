@@ -2,8 +2,6 @@
 
 FROM golemfactory/base:1.2
 
-MAINTAINER Artur Zawłocki <artur.zawlocki@imapp.pl>
-
 ENV RASPA_DIR=/home/task/RASPA
 
 RUN mkdir /golem/raspa && \
