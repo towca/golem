@@ -1,8 +1,6 @@
-# Dockerfile for tasks requiring LuxRender.
+# Dockerfile for tasks requiring PDFgen.
 
 FROM golemfactory/base:1.2
-
-MAINTAINER Artur Zawłocki <artur.zawlocki@imapp.pl>
 
 ENV PDFGEN_DIR=/home/task/PDFGEN
 
