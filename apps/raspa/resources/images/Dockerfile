@@ -1,4 +1,4 @@
-# Dockerfile for tasks requiring LuxRender.
+# Dockerfile for tasks requiring RASPA.
 
 FROM golemfactory/base:1.2
 
