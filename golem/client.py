@@ -898,10 +898,6 @@ class Client(HardwarePresetsMixin):
         self.remove_task(task_id)
         self.task_server.task_manager.delete_task(task_id)
         self.funds_locker.remove_task(task_id)
-    
-    def purge_tasks(self):
-        for t in self.get_tasks():
-            self.delete_task(t['id'])
 
     def get_node(self):
         return self.node.to_dict()
